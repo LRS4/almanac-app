@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+	<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<h1 class="h2">Map</h1>
+		<div class="btn-toolbar mb-2 mb-md-0">
+			<div class="btn-group mr-2">
+				<button class="btn btn-sm btn-outline-secondary disabled">Overlay Options -></button>
+				<button class="btn btn-sm btn-outline-secondary">Population</button>
+				<button class="btn btn-sm btn-outline-secondary">Economic</button>
+				<button class="btn btn-sm btn-outline-secondary">Political</button>
+				<button class="btn btn-sm btn-outline-secondary">Crime</button>
+				<button class="btn btn-sm btn-outline-secondary">Energy</button>
+				<button class="btn btn-sm btn-outline-secondary">Health</button>
+				<button class="btn btn-sm btn-outline-secondary">Population</button>
+				<button class="btn btn-sm btn-outline-secondary">Jobs</button>
+				<button class="btn btn-sm btn-outline-secondary">Transport</button>
+			</div>
+			<button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+			<span data-feather="calendar"></span>
+			This week
+			</button>
+		</div>
+		</div>
+		
+		<div id="mapid"></div>
+
+	</main>
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+	<!-- Icons -->
+	<script>
+		feather.replace()
+	</script>
+
+	<!-- Map -->
+	<script>
+
+		// function to add commas to large numbers
+		function numberWithCommas(x) {
+			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+		// initialize the map on the "map" div with a given center and zoom
+		var mymap = L.map('mapid').setView([53.909, -2.61], 6);  // [long, lat], zoom  -1.61, 52.909
+
+		// add background tile settings
+		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11'
+		}).addTo(mymap);
+
+		// https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
+		// https://census.ukdataservice.ac.uk/get-data/related/population.
+		// https://datavizforall.org/convert-edit-join-and-dissolve-with-mapshaper-org.html
+
+		// add external geoJSON layer using leaflet-ajax
+		//var geojsonLayer = new L.GeoJSON.AJAX("https://opendata.arcgis.com/datasets/16221426b9ee468d9c80f8398ded851f_0.geojson");
+		var geojsonLayer = new L.GeoJSON.AJAX("http://localhost:5000/geojson", {
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup('<p>'+feature.properties.LAD19NM +'</p><p>name: '+feature.properties['Estimated Population mid-2018'] +'</p>');
+			}
+		});
+
+		geojsonLayer.addTo(mymap);
+	
+	</script>
+
+{% endblock %}

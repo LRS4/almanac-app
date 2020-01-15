@@ -15,14 +15,20 @@
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+
     <!-- Custom styles for this template -->
     <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+
+    <!-- Feather icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
   </head>
 
   <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="">Welcome, PM</a>
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
@@ -37,72 +43,111 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" href="/">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file"></span>
-                  Orders
+                <a class="nav-link" href="/population">
+                  <span data-feather="users"></span>
+                  Population
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
                   <span data-feather="shopping-cart"></span>
-                  Products
+                  Economy
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="users"></span>
-                  Customers
+                  <span data-feather="thumbs-up"></span>
+                  Politics
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="bar-chart-2"></span>
-                  Reports
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="layers"></span>
-                  Integrations
+                <a class="nav-link" href="/map">
+                  <span data-feather="map"></span>
+                  Map
                 </a>
               </li>
             </ul>
 
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-              <span>Saved reports</span>
-              <a class="d-flex align-items-center text-muted" href="#">
-                <span data-feather="plus-circle"></span>
-              </a>
+              <span>Happiness</span>
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Current month
+                  <span data-feather="shield"></span>
+                  Crime Safety
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last quarter
+                  <span data-feather="target"></span>
+                  Defence
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Social engagement
+                  <span data-feather="book"></span>
+                  Education
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Year-end sale
+                  <span data-feather="zap"></span>
+                  Energy
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="cloud"></span>
+                  Environment
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="heart"></span>
+                  Healthcare
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="home"></span>
+                  Housing
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="briefcase"></span>
+                  Job
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="truck"></span>
+                  Transport
+                </a>
+              </li>
+            </ul>
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>References</span>
+            </h6>
+            <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="database"></span>
+                  Data
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="tool"></span>
+                  Tools
                 </a>
               </li>
             </ul>
@@ -120,11 +165,23 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				...
+        Congratulations on your election win, Prime Minister! Although now comes the hard part of actually running the place... 
+        Not to fear! Your trusty advisor has put together an almanac of information on our beloved country to bring you up to speed.
+        <br><br>
+        I'm sure we will be improving things in no time, and the citizens will love us for it! Our very own island of paradise! So much to 
+        do and such little time... the next election will be here in no time and we need those approval ratings high.
+        <br><br>
+        The information comes from only the finest sources including:
+        <ul>
+          <li>Census Data</li>
+          <li>CIA World Factbook</li>
+          <li>GOV.UK</li>
+          <li>ONS</li>
+          <li>World Bank</li>
+        </ul>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary">Save changes</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
 			</div>
 			</div>
 		</div>

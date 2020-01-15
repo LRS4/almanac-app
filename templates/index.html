@@ -4,7 +4,7 @@
 
 	<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h1 class="h2">Dashboard</h1>
+		<h1 class="h2">Background</h1>
 		<div class="btn-toolbar mb-2 mb-md-0">
 			<div class="btn-group mr-2">
 			<button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -16,120 +16,12 @@
 			</button>
 		</div>
 		</div>
+				
+		<p id="backgroundText"></p>
 
-		<h2 id="sectionTitle">Section title</h2>
-		<div class="table-responsive">
-		<table class="table table-hover table-striped table-sm">
-			<thead>
-			<tr>
-				<th>Header1</th>
-				<th>Header2</th>
-				<th>%</th>
-				<th>test</th>
-			</tr>
-			</thead>
-			<tbody>
-			<tr id="populationRow">
-				<td>Population</td>
-				<td id="populationValue">...</td>
-				<td>100</td>
-				<td>sit</td>
-			</tr>
-			<tr>
-				<td id="passengersRow">Daily Rail Passengers</td>
-				<td>consectetur</td>
-				<td>adipiscing</td>
-				<td>elit</td>
-			</tr>
-			<tr>
-				<td>Integer</td>
-				<td>nec</td>
-				<td>odio</td>
-				<td>Praesent</td>
-			</tr>
-			<tr>
-				<td>libero</td>
-				<td>Sed</td>
-				<td>cursus</td>
-				<td>ante</td>
-			</tr>
-			<tr>
-				<td>dapibus</td>
-				<td>diam</td>
-				<td>Sed</td>
-				<td>nisi</td>
-			</tr>
-			<tr>
-				<td>Nulla</td>
-				<td>quis</td>
-				<td>sem</td>
-				<td>at</td>
-			</tr>
-			<tr>
-				<td>nibh</td>
-				<td>elementum</td>
-				<td>imperdiet</td>
-				<td>Duis</td>
-			</tr>
-			<tr>
-				<td>sagittis</td>
-				<td>ipsum</td>
-				<td>Praesent</td>
-				<td>mauris</td>
-			</tr>
-			<tr>
-				<td>Fusce</td>
-				<td>nec</td>
-				<td>tellus</td>
-				<td>sed</td>
-			</tr>
-			<tr>
-				<td>augue</td>
-				<td>semper</td>
-				<td>porta</td>
-				<td>Mauris</td>
-			</tr>
-			<tr>
-				<td>massa</td>
-				<td>Vestibulum</td>
-				<td>lacinia</td>
-				<td>arcu</td>
-			</tr>
-			<tr>
-				<td>eget</td>
-				<td>nulla</td>
-				<td>Class</td>
-				<td>aptent</td>
-			</tr>
-			<tr>
-				<td>taciti</td>
-				<td>sociosqu</td>
-				<td>ad</td>
-				<td>litora</td>
-			</tr>
-			<tr>
-				<td>torquent</td>
-				<td>per</td>
-				<td>conubia</td>
-				<td>nostra</td>
-			</tr>
-			<tr>
-				<td>per</td>
-				<td>inceptos</td>
-				<td>himenaeos</td>
-				<td>Curabitur</td>
-			</tr>
-			<tr>
-				<td>sodales</td>
-				<td>ligula</td>
-				<td>in</td>
-				<td>libero</td>
-			</tr>
-			</tbody>
-		</table>
-		</div>
+		<p id="economyText"></p>
 
-		<canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+		<p>Source: CIA World Factbook</p>
 
 	</main>
 	</div>
@@ -141,143 +33,30 @@
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
+	
 	<!-- Icons -->
-	<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
 	<script>
-	feather.replace()
+		feather.replace()
 	</script>
 
-	<!-- Graphs -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
 	<script>
 
-	// Get TOTAL POPULATION STATS
-	var populationTotals = [];
-	var populationYears = [];
-
-	$.ajax({
-	type:"GET",
-	url:"http://api.worldbank.org/v2/country/gb/indicator/SP.POP.TOTL.?format=json",
-	async:false,
-	dataType: "json",
-	success: function(data) {
-		//console.log(data);
-		
-		// get current population and set in table
-		if (data[1][0]["value"] == null) {
-		var currentPopulationTotal = data[1][1]["value"]
-		} else {
-		var currentPopulationTotal = data[1][0]["value"]
-		}
-		$("#populationValue").text(currentPopulationTotal);
-
-		// add to arrays
-		for (let i = 0; i < data[1].length; i++ ) {
-		if (data[1][i]["value"] != null) {
-			populationTotals.unshift(data[1][i]["value"]);
-			populationYears.unshift((data[1][i]["date"])).toString();
-		}
-		}
-	},
-	error: function(errorMessage){
-		alert("Error");
-	}
-	});
-
-	$.ajax({
-	type:"GET",
-	url:"http://api.worldbank.org/v2/country/gb/indicator/SP.POP.TOTL.?format=json&page=2",
-	async:false,
-	dataType: "json",
-	success: function(data) {
-		// add to arrays
-		for (let i = 0; i < data[1].length; i++ ) {
-		if (data[1][i]["value"] != null) {
-			populationTotals.unshift(data[1][i]["value"]);
-			populationYears.unshift((data[1][i]["date"])).toString();
-		}
-		}
-	},
-	error: function(errorMessage){
-		alert("Error");
-	}
-	});
-
-	// Get LATEST WORLD FACTBOOK
-	$.ajax({
-		type:"GET",
-		url:"https://raw.githubusercontent.com/iancoleman/cia_world_factbook_api/master/data/factbook.json",
-		async:false,
-		dataType: "json",
-		success: function(data) {
-		console.log("World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
-		$("#sectionTitle").html(data.countries.united_kingdom.data.name);
-		console.log(data.countries.united_kingdom.data);
-		console.log(data.countries.united_kingdom.data.introduction['background']);
-		},
-		error: function(errorMessage){
-			console.error("World Factbook API is not responding...")
-		}
-	});
-
-	// DUMMY DATA
-	var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-	var dailyValues = [15339, 21345, 18483, 24003, 23489, 24092, 12034];
-
-		// CREATE BASE LINE CHART
-	var ctx = document.getElementById("myChart");
-	var myChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-		labels: populationYears,
-		datasets: [{
-			
-			data: populationTotals,
-			lineTension: 0,
-			backgroundColor: 'transparent',
-			borderColor: '#007bff',
-			borderWidth: 4,
-			pointBackgroundColor: '#007bff'
-		}]
-		},
-		options: {
-		scales: {
-			yAxes: [{
-			ticks: {
-				beginAtZero: false
+		// Get LATEST WORLD FACTBOOK
+		$.ajax({
+			type:"GET",
+			url:"https://raw.githubusercontent.com/iancoleman/cia_world_factbook_api/master/data/factbook.json",
+			async:false,
+			dataType: "json",
+			success: function(data) {
+			console.log("CIA World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
+			$("#backgroundText").html(data.countries.united_kingdom.data.introduction['background']);
+			$("#economyText").html(data.countries.united_kingdom.data.economy['overview'])
+			console.log(data.countries.united_kingdom.data);
+			},
+			error: function(errorMessage){
+				console.error("World Factbook API is not responding...")
 			}
-			}]
-		},
-		legend: {
-			display: false,
-		},
-		title: {
-			display: true,
-			text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
-			position: 'bottom'
-		}
-		}
-	});
-
-
-
-	// Change Graph Logic
-	$("tr").click(function(event) {
-	//console.log(event.target.parentElement.id);
-	});
-
-	$("#populationRow").click(function() {
-		myChart.data.datasets[0].data = populationTotals;
-		myChart.data.labels = populationYears; 
-		myChart.update();
-	});
-
-	$("#passengersRow").click(function() {
-		myChart.data.datasets[0].data = dailyValues;
-		myChart.data.labels = days; 
-		myChart.update();
-	});
+		});
 
 	</script>
 
