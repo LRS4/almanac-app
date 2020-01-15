@@ -35,7 +35,7 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
 
 	<!-- Icons -->
 	<script>
@@ -51,7 +51,7 @@
 		}
 
 		// initialize the map on the "map" div with a given center and zoom
-		var mymap = L.map('mapid').setView([53.909, -2.61], 6);  // [long, lat], zoom  -1.61, 52.909
+		var map = L.map('mapid').setView([53.909, -2.61], 6);  // [long, lat], zoom  -1.61, 52.909
 
 		// add background tile settings
 		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -60,21 +60,104 @@
 			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 		id: 'mapbox/streets-v11'
-		}).addTo(mymap);
+		}).addTo(map);
 
-		// https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
-		// https://census.ukdataservice.ac.uk/get-data/related/population.
-		// https://datavizforall.org/convert-edit-join-and-dissolve-with-mapshaper-org.html
+		// function to set rules for colours for population density
+		function getColor(d) {
+          return d > 1000 ? '#800026' :
+                d > 500  ? '#BD0026' :
+                d > 200  ? '#E31A1C' :
+                d > 100  ? '#FC4E2A' :
+                d > 50   ? '#FD8D3C' :
+                d > 20   ? '#FEB24C' :
+                d > 10   ? '#FED976' :
+                            '#FFEDA0';
+      }
 
-		// add external geoJSON layer using leaflet-ajax
-		//var geojsonLayer = new L.GeoJSON.AJAX("https://opendata.arcgis.com/datasets/16221426b9ee468d9c80f8398ded851f_0.geojson");
-		var geojsonLayer = new L.GeoJSON.AJAX("http://localhost:5000/geojson", {
-			onEachFeature: function (feature, layer) {
-				layer.bindPopup('<p>'+feature.properties.LAD19NM +'</p><p>name: '+feature.properties['Estimated Population mid-2018'] +'</p>');
-			}
-		});
+      // Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
+      // also adjusting the appearance a bit and adding a nice touch with dashed stroke.
+      function style(feature) {
+          return {
+              fillColor: getColor(feature.properties['2018 people per sq. km']),
+              weight: 0.5,
+              opacity: 1,
+              color: 'black',
+              dashArray: '3',
+              fillOpacity: 0.7
+          };
+      }
 
-		geojsonLayer.addTo(mymap);
+	  // add previous steps to map
+	  $.getJSON("static/data.json" ,function(data) {
+	  	L.geoJson(data, {style: style}).addTo(map);
+	  });
+
+      // Now let’s make the states highlighted visually in some way when they are hovered with a mouse.
+      function highlightFeature(e) {
+          var layer = e.target;
+
+          layer.setStyle({
+              weight: 2.5,
+              color: '#666',
+              dashArray: '',
+              fillOpacity: 0.7
+          });
+
+          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+              layer.bringToFront();
+          }
+
+          info.update(layer.feature.properties);
+      }
+
+      // Define what happens when mouse leaves polygon
+      function resetHighlight(e) {
+          geojson.resetStyle(e.target);
+          info.update();
+      }
+
+      // As an additional touch, let’s define a click listener that zooms to the state:
+      function zoomToFeature(e) {
+          map.fitBounds(e.target.getBounds());
+	  }
+	  
+	  // Now we’ll use the onEachFeature option to add the listeners on our state layers:
+      function onEachFeature(feature, layer) {
+          layer.on({
+              mouseover: highlightFeature,
+              mouseout: resetHighlight,
+              click: zoomToFeature
+          });
+      }
+
+	  // Update map with layers
+	  $.getJSON("static/data.json" ,function(data) {
+		geojson = L.geoJson(data, {
+          style: style,
+          onEachFeature: onEachFeature
+      	}).addTo(map);
+	  });
+
+      // We could use the usual popups on click to show information about different states, but we’ll choose a different route 
+      // — showing it on state hover inside a custom control.
+      var info = L.control();
+
+      info.onAdd = function (map) {
+          this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+          this.update();
+          return this._div;
+      };
+
+      // method that we will use to update the control based on feature properties passed
+      info.update = function (props) {
+          this._div.innerHTML = '<h5>Population Density</h5>' +  (props ?
+			  '<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
+			  + props['2018 people per sq. km'] + ' people per sq. km' +
+			  '<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
+              : 'Hover over a boundary');
+      };
+
+      info.addTo(map);
 	
 	</script>
 

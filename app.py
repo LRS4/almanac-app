@@ -4,9 +4,8 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 
-import pickle
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
 
 # PEP8 Python Validator Tool: http://pep8online.com/
 
@@ -46,19 +45,12 @@ def population():
 @app.route("/map", methods=['GET'])
 def map():
     """Show map"""
-    return render_template("map.html") 
-
-@app.route("/geojson", methods=['GET'])
-def geojson():
-    """Get geoJSON API"""
-    # static/data/test_data.json
     filename = os.path.join(app.static_folder, 'data.json')
 
     with open(filename) as test_file:
         data = json.load(test_file)
-    
-    return json.dumps(data) 
 
+    return render_template("map.html", data = data) 
 
 if __name__ == '__main__':
     app.run()
