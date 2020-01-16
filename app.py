@@ -34,23 +34,31 @@ Session(app)
 @app.route("/", methods=['GET', 'POST'])
 def index():
     """Show introduction screen"""
-    return render_template("index.html")
+    marker = 'home'
+    return render_template("index.html", marker=marker)
 
 
 @app.route("/population", methods=['GET'])
 def population():
     """Show population statistics"""
-    return render_template("population.html")
+    marker = 'population'
+    return render_template("population.html", marker=marker)
 
 @app.route("/map", methods=['GET'])
 def map():
     """Show map"""
-    filename = os.path.join(app.static_folder, 'data.json')
+    marker = 'map'
+    return render_template("map.html", marker=marker) 
 
-    with open(filename) as test_file:
-        data = json.load(test_file)
+@app.route("/sources", methods=['GET'])
+def sources():
+    """Show data sources list"""
+    return render_template("sources.html")
 
-    return render_template("map.html", data = data) 
+@app.route("/tools", methods=['GET'])
+def tools():
+    """Show tools list"""
+    return render_template("tools.html")  
 
 if __name__ == '__main__':
     app.run()

@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Almanac Dashboard</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.1/examples/dashboard/">
 
@@ -43,17 +43,25 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
+                {% if marker == 'home' %}
                 <a class="nav-link active" href="/">
+                {% else %}
+                <a class="nav-link" href="/">
+                {% endif %}
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
+                {% if marker == 'population' %}
+                <a class="nav-link active" href="/population">
+                {% else %}
                 <a class="nav-link" href="/population">
+                {% endif %}
                   <span data-feather="users"></span>
                   Population
                 </a>
-              </li>
+              <li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
                   <span data-feather="shopping-cart"></span>
@@ -61,13 +69,17 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="https://www.gov.uk/government/ministers" target="_blank">
                   <span data-feather="thumbs-up"></span>
                   Politics
                 </a>
               </li>
               <li class="nav-item">
+                {% if marker == 'map' %}
+                <a class="nav-link active" href="/map">
+                {% else %}
                 <a class="nav-link" href="/map">
+                {% endif %}
                   <span data-feather="map"></span>
                   Map
                 </a>
@@ -139,13 +151,13 @@
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/sources">
                   <span data-feather="database"></span>
                   Data
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/tools">
                   <span data-feather="tool"></span>
                   Tools
                 </a>

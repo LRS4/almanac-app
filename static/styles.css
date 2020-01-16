@@ -16,6 +16,12 @@ vertical-align: text-bottom;
   height: 650px;
 }
 
+#electionMap {
+  height: 600px;
+  width:600px;
+  margin-left: 20%;
+}
+
 /*
 * Sidebar
 */
