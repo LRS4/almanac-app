@@ -8,9 +8,9 @@
 		<div class="btn-toolbar mb-2 mb-md-0">
 			<div class="btn-group mr-2">
 				<button class="btn btn-sm btn-outline-secondary disabled">Overlay Options -></button>
-				<button class="btn btn-sm btn-outline-secondary">Population</button>
+				<button id="btnPopulationLayer" class="btn btn-sm btn-outline-secondary">Population</button>
 				<button class="btn btn-sm btn-outline-secondary">Economic</button>
-				<button class="btn btn-sm btn-outline-secondary">Political</button>
+				<button id="btnPoliticsLayer" class="btn btn-sm btn-outline-secondary">Political</button>
 				<button class="btn btn-sm btn-outline-secondary">Crime</button>
 				<button class="btn btn-sm btn-outline-secondary">Energy</button>
 				<button class="btn btn-sm btn-outline-secondary">Health</button>
@@ -27,6 +27,8 @@
 		
 		<div id="mapid"></div>
 
+		<p>Source Data: <a id="mapDataSource" href="#" target="blank">...</a></p>
+
 	</main>
 
 	<!-- Bootstrap core JavaScript
@@ -37,6 +39,7 @@
 	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
 	<script src="{{url_for('static', filename='data.js')}}"></script>
+	<script src="{{url_for('static', filename='pcon_election_2019.js')}}"></script>
 
 	<!-- Icons -->
 	<script>
@@ -52,12 +55,12 @@
 		}
 
 		// initialize the map on the "map" div with a given center and zoom
-		var map = L.map('mapid').setView([53.909, -2.61], 6);  // [long, lat], zoom  -1.61, 52.909
+		var map = L.map('mapid').setView([54.509, -3.61], 6);  // [long, lat], zoom  -1.61, 52.909
 
 		// add background tile settings
 		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-		maxZoom: 18,
-		minZoom: 3,
+		maxZoom: 10,
+		minZoom: 6,
 		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -74,90 +77,177 @@
                 d > 20   ? '#FEB24C' :
                 d > 10   ? '#FED976' :
                             '#FFEDA0';
-      }
+		}
+		  
+		// function to set fules for colours for election results
+		function getElectionResultColor(result) {
+			return result == 'Con' ? 'blue':
+				result == 'Lab'   ? 'red' : 
+				result == 'LD'    ? '#E79B50' : 
+				result == 'Green' ? '#52DF00' :
+				result == 'DUP'   ? '#D21311' :
+				result == 'PC'    ? '#006A56' : 
+				result == 'SDLP'  ? '#006E51' : 
+				result == 'SF'    ? '#258C43' :
+				result == 'SNP'   ? 'yellow' :
+				result == 'Alliance' ? '#F4C72E' :
+								    "white"
+		}
 
-      // Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
-      // also adjusting the appearance a bit and adding a nice touch with dashed stroke.
-      function style(feature) {
-          return {
-              fillColor: getColor(feature.properties['2018 people per sq. km']),
-              weight: 0.5,
-              opacity: 1,
-              color: 'black',
-              dashArray: '3',
-              fillOpacity: 0.7
-          };
-	  }
-	  
-	  console.log(mapData)
+		// Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
+		// also adjusting the appearance a bit and adding a nice touch with dashed stroke.
+		function style(feature) {
+			return {
+				fillColor: getColor(feature.properties['2018 people per sq. km']),
+				weight: 0.5,
+				opacity: 1,
+				color: 'black',
+				dashArray: '3',
+				fillOpacity: 0.7
+			};
+		}
 
-	  // add previous steps to map
-	  L.geoJson(mapData, {style: style}).addTo(map);
+		function styleElectionMap(feature) {
+			return {
+				fillColor: getElectionResultColor(feature.properties['first_party']),
+				weight: 0.5,
+				opacity: 1,
+				color: 'black',
+				dashArray: '3',
+				fillOpacity: 0.7
+			};
+		}
 
-      // Now let’s make the states highlighted visually in some way when they are hovered with a mouse.
-      function highlightFeature(e) {
-          var layer = e.target;
+		// Now let’s make the states highlighted visually in some way when they are hovered with a mouse.
+		function highlightFeature(e) {
+			var layer = e.target;
 
-          layer.setStyle({
-              weight: 2.5,
-              color: '#666',
-              dashArray: '',
-              fillOpacity: 0.7
-          });
+			layer.setStyle({
+				weight: 2.5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
 
-          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-              layer.bringToFront();
-          }
+			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+				layer.bringToFront();
+			}
 
-          info.update(layer.feature.properties);
-      }
+			info.update(layer.feature.properties);
+		}
 
-      // Define what happens when mouse leaves polygon
-      function resetHighlight(e) {
-          geojson.resetStyle(e.target);
-          info.update();
-      }
+		// Define what happens when mouse leaves polygon
+		function resetHighlight(e) {
+			geojsonLayers.mapData.resetStyle(e.target);
+			info.update();
+		}
 
-      // As an additional touch, let’s define a click listener that zooms to the state:
-      function zoomToFeature(e) {
-          map.fitBounds(e.target.getBounds());
-	  }
-	  
-	  // Now we’ll use the onEachFeature option to add the listeners on our state layers:
-      function onEachFeature(feature, layer) {
-          layer.on({
-              mouseover: highlightFeature,
-              mouseout: resetHighlight,
-              click: zoomToFeature
-          });
-      }
+		function resetHighlightElection(e) {
+			geojsonLayers.electionData.resetStyle(e.target);
+			info.update();
+		}
 
-	  // Update map with layers
-	  geojson = L.geoJson(mapData, {
-          style: style,
-          onEachFeature: onEachFeature
-      }).addTo(map);
+		// As an additional touch, let’s define a click listener that zooms to the state:
+		function zoomToFeature(e) {
+			map.fitBounds(e.target.getBounds());
+		}
+		
+		// Now we’ll use the onEachFeature option to add the listeners on our state layers:
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				click: zoomToFeature
+			});
+		}
 
-      // We could use the usual popups on click to show information about different states, but we’ll choose a different route 
-      // — showing it on state hover inside a custom control.
-      var info = L.control();
+		function onEachFeatureElection(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlightElection,
+				click: zoomToFeature
+			});
+		}
 
-      info.onAdd = function (map) {
-          this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-          this.update();
-          return this._div;
-      };
+		// We could use the usual popups on click to show information about different states, but we’ll choose a different route 
+		// — showing it on state hover inside a custom control.
+		var info = L.control();
 
-      // method that we will use to update the control based on feature properties passed
-      info.update = function (props) {
-          this._div.innerHTML = '<h5>Population Density</h5>' +  (props ?
-			  '<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
-			  + props['2018 people per sq. km'] + ' people per sq. km' +
-			  '<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
-              : 'Hover over a boundary');
-      };
+		info.onAdd = function (map) {
+			this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+			this.update();
+			return this._div;
+		};
 
-      info.addTo(map);
+		// method that we will use to update the control based on feature properties passed
+		info.update = function (props) {
+			this._div.innerHTML = '<h5>Population Density</h5>' +  (props ?
+				'<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
+				+ props['2018 people per sq. km'] + ' people per sq. km' +
+				'<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
+				: 'Hover over a boundary');
+		};
+
+		// add info custom control to map
+		info.addTo(map);
+
+		// CREATE THE BASE LAYERS
+		var geojsonLayers = {
+			'mapData': L.geoJson(mapData, {
+				style: style,
+				onEachFeature: onEachFeature
+			}),
+			'electionData': L.geoJson(electionResults, {
+				style: styleElectionMap,
+				onEachFeature: onEachFeatureElection
+			})
+		};
+		
+		// add layer to map
+		$('#mapDataSource').text('ONS Population Estimates').attr('href', 'https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland')
+		map.addLayer(geojsonLayers.mapData);
+
+		// Update map with layers based upon conditions
+		$('#btnPoliticsLayer').click(function() {
+			map.removeLayer(geojsonLayers.mapData)
+
+			// update hover panel
+			info.update = function (props) {
+				this._div.innerHTML = '<h5>Election Results 2019</h5>' +  (props ?
+					'<b>' + props.pcon17nm + '</b><br /><b>' + props.result + '</b><br /><br />' 
+					+ 'Majority: ' + props.majority + '<br />'
+					+ 'Second Party: ' + props.second_party + '<br />'
+					+ 'Electorate: ' + props.electorate + '<br />'
+					+ 'Valid Votes: ' + props.valid_votes + '<br />'
+					+ 'Turnout: ' + (((props.valid_votes + props.invalid_votes) / props.electorate) * 100).toFixed(2) + '% <br />'
+
+					: 'Hover over a boundary');
+			};
+			
+			// call update method
+			info.update();
+
+			// add layer
+			map.addLayer(geojsonLayers.electionData);
+
+			// update data source caption
+			$('#mapDataSource').text('Commons Library Briefing Paper - 2019 General Election Results').attr('href', 'https://researchbriefings.parliament.uk/ResearchBriefing/Summary/CBP-8749')
+		});
+
+		$('#btnPopulationLayer').click(function() {
+			map.removeLayer(geojsonLayers.electionData)
+			info.update = function (props) {
+				this._div.innerHTML = '<h5>Population Density</h5>' +  (props ?
+					'<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
+					+ props['2018 people per sq. km'] + ' people per sq. km' +
+					'<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
+					: 'Hover over a boundary');
+			};
+			info.update();
+			map.addLayer(geojsonLayers.mapData);
+			$('#mapDataSource').text('ONS Population Estimates').attr('href', 'https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland')
+		});
+		
 	
 	</script>
 
