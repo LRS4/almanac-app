@@ -7,19 +7,23 @@
 		<h1 class="h2">Home</h1>
 		<div class="btn-toolbar mb-2 mb-md-0">
 			<div class="btn-group mr-2">
-			<button class="btn btn-sm btn-outline-secondary">Daily Briefing</button>
-			<button class="btn btn-sm btn-outline-secondary">Country Profile</button>
+			<button id="btnDailyBriefing" class="btn btn-sm btn-outline-secondary">Daily Briefing</button>
+			<button id="btnCountryProfile" class="btn btn-sm btn-outline-secondary">Country Profile</button>
 			</div>
 		</div>
 		</div>
 
-		<p id="todayInHistoryBanner" class="text-center"><b>...</b></p> 
+		<div id="todayInHistoryBanner" class="alert alert-info" role="alert">
+			...
+		</div>
 
 		<div class="tenThingsSection">
-			
+			<h3>Daily Briefing</h3>
+			<b>TEN THINGS YOU NEED TO KNOW TODAY</b> by <a href="https://www.theweek.co.uk/daily-briefing" target="_blank">The Week</a>
+			{{ newsHtml | safe }}
 		</div>
 		
-		<div class="backgroundSection">
+		<div class="backgroundSection" style="display: none">
 			<h3>Profile</h3>
 			<div class="spinner-border" role="status">
 				<span class="sr-only">Loading...</span>
@@ -93,6 +97,7 @@
 
 						// Update DOM with new item
 						$('#todayInHistoryBanner').html(data.date + ' ' + newItem.html);
+						$('#todayInHistoryBanner a').attr('target', '_blank').addClass("alert-link");
 
 					});
 					
@@ -109,6 +114,20 @@
 		setInterval(function(){
 			getRandomHistoryFact();
 		}, 15000);
+
+		// add open in a new tab to links
+		$('.field-collection-view a').attr('target', '_blank');
+
+		// toggle buttons
+		$('#btnDailyBriefing').click(function() {
+			$('.tenThingsSection').css('display', 'block');
+			$('.backgroundSection').css('display', 'none');
+		});
+
+		$('#btnCountryProfile').click(function() {
+			$('.tenThingsSection').css('display', 'none');
+			$('.backgroundSection').css('display', 'block');
+		});
 
 	</script>
 
