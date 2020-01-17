@@ -12,14 +12,22 @@
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.1/examples/dashboard/">
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+    <!-- JS Cookie -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
 
-    <!-- Custom styles for this template -->
+    <!-- Custom styles and script for this template -->
     <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 
     <!-- Feather icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
@@ -28,11 +36,33 @@
   <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="">Welcome, PM</a>
-      <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">Welcome, PM</a>
+      <ul id="navMetrics" class="nav nav-expand mb-2" style="margin-top: 2px; padding-top:0; display:none;">
+        <li class="nav-item">
+          <a class="nav-link alert-link" href="/economy" data-toggle="tooltip" data-placement="bottom" title="This entry records the difference between national government revenues and expenditures, expressed as a percent of GDP. A positive (+) number indicates that revenues exceeded expenditures (a budget surplus), while a negative (-) number indicates the reverse (a budget deficit). Normalizing the data, by dividing the budget balance by GDP, enables easy comparisons across countries and indicates whether a national government saves or borrows money. Countries with high budget deficits (relative to their GDPs) generally have more difficulty raising funds to finance expenditures, than those with lower deficits.">
+            <span data-feather="dollar-sign" style="color: white"></span>
+            <span class="economyMetric" style="color: white">-25,000,000,000</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link alert-link" href="/population" data-toggle="tooltip" data-placement="bottom" title="This shows the total population currently residing according to ONS and World Bank estimates" style="color: white">
+            <span data-feather="users" style="color: white"></span>
+            <span class="populationMetric" style="color: white">...</span>
+          </a>
+        </li>
+        <li class="nav-item alert-link">
+          <a class="nav-link" href="/crime-safety" style="color: white">
+            <span data-feather="smile" style="color: white"></span>
+            <span class="happinessMetric" style="color: white">...</span>
+          </a>
+        </li>
+      </ul>
       <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModalCenter">Help</a>
+        <li class="nav-item alert-link text-nowrap">
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModalCenter">
+            <span data-feather="help-circle" style="color: white"></span>
+            <span style="color: white">Help</span>
+          </a>
         </li>
       </ul>
     </nav>
@@ -177,7 +207,7 @@
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+				<h5 class="modal-title" id="exampleModalLongTitle">How hard can this be?</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 				</button>
@@ -208,4 +238,9 @@
 		{% block main %}{% endblock %}
 
   </body>
+  <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+  </script>
 </html>
