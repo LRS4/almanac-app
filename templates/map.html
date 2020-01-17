@@ -25,6 +25,11 @@
 		</div>
 		</div>
 		
+		<div id='mapSpinner' class="d-flex justify-content-center">
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>	
 		<div id="mapid"></div>
 
 		<p>Source Data: <a id="mapDataSource" href="#" target="blank">...</a></p>
@@ -66,6 +71,8 @@
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 		id: 'mapbox/streets-v11'
 		}).addTo(map);
+
+		$('#mapSpinner, .spinner-border').css('display', 'none');
 
 		// function to set rules for colours for population density
 		function getPopulationColor(d) {
@@ -169,7 +176,7 @@
 				'<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
 				+ props['2018 people per sq. km'] + ' people per sq. km' +
 				'<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
-				: 'Hover over a boundary');
+				: 'Hover over a boundary <br /> Scroll to zoom');
 		};
 
 		// add info custom control to map
@@ -240,7 +247,7 @@
 					+ 'Turnout: ' + (((props.valid_votes + props.invalid_votes) / props.electorate) * 100).toFixed(2) + '% <br />'
 					+ 'MP: ' + props.mp_firstname + ' ' + props.mp_surname
 
-					: 'Hover over a boundary');
+					: 'Hover over a boundary <br /> Scroll to zoom');
 			};
 			
 			// call update method
@@ -260,7 +267,7 @@
 					'<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
 					+ props['2018 people per sq. km'] + ' people per sq. km' +
 					'<br />' + props['Estimated Population mid-2018'] + ' people total' + '<br />'
-					: 'Hover over a boundary');
+					: 'Hover over a boundary <br/> Scroll to zoom');
 			};
 			info.update();
 			map.addLayer(geojsonLayers.mapData);

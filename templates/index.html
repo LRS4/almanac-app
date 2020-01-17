@@ -4,24 +4,35 @@
 
 	<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h1 class="h2">Background</h1>
+		<h1 class="h2">Home</h1>
 		<div class="btn-toolbar mb-2 mb-md-0">
 			<div class="btn-group mr-2">
-			<button class="btn btn-sm btn-outline-secondary">Share</button>
-			<button class="btn btn-sm btn-outline-secondary">Export</button>
+			<button class="btn btn-sm btn-outline-secondary">Daily Briefing</button>
+			<button class="btn btn-sm btn-outline-secondary">Country Profile</button>
 			</div>
-			<button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-			<span data-feather="calendar"></span>
-			This week
-			</button>
 		</div>
 		</div>
-				
-		<p id="backgroundText"></p>
 
-		<p id="economyText"></p>
+		<p id="todayInHistoryBanner" class="text-center"><b>...</b></p> 
 
-		<p>Source: CIA World Factbook</p>
+		<div class="tenThingsSection">
+			
+		</div>
+		
+		<div class="backgroundSection">
+			<h3>Profile</h3>
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+			<p id="backgroundText"></p>
+
+			<h3>Trade</h3>
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+			<p id="economyText"></p>
+			<source>Source: <a href="https://www.cia.gov/library/publications/the-world-factbook/" target="_blank">CIA World Factbook</a></source>
+		</div>
 
 	</main>
 	</div>
@@ -33,7 +44,7 @@
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-	
+
 	<!-- Icons -->
 	<script>
 		feather.replace()
@@ -48,15 +59,56 @@
 			async:false,
 			dataType: "json",
 			success: function(data) {
-			console.log("CIA World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
-			$("#backgroundText").html(data.countries.united_kingdom.data.introduction['background']);
-			$("#economyText").html(data.countries.united_kingdom.data.economy['overview'])
-			console.log(data.countries.united_kingdom.data);
+				console.log("CIA World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
+				$('.spinner-border').css('display', 'none');
+				$("#backgroundText").html(data.countries.united_kingdom.data.introduction['background']);
+				$("#economyText").html(data.countries.united_kingdom.data.economy['overview'])
+				console.log(data.countries.united_kingdom.data);
 			},
 			error: function(errorMessage){
 				console.error("World Factbook API is not responding...")
 			}
 		});
+
+		function getRandomHistoryFact() {
+			$.ajax({
+				type:"GET",
+				url:"https://history.muffinlabs.com/date",
+				dataType: 'JSONP',
+				data: {
+					format: "json"
+				},
+				jsonpCallback: 'callbackFnc',
+				async: false,
+				global: false,
+				crossDomain: true,
+				success: function(data) {
+					var arrayLength = data.data.Events.length - 1;
+
+					// Wipe previous search results
+					$("#todayInHistoryBanner").fadeOut(500, function() {
+						// API results
+						var randomIndex = Math.floor(Math.random() * (arrayLength - 0 + 1)) + 0;
+						var newItem = data.data.Events[randomIndex];
+
+						// Update DOM with new item
+						$('#todayInHistoryBanner').html(data.date + ' ' + newItem.html);
+
+					});
+					
+					$("#todayInHistoryBanner").fadeIn(500);
+				},
+				error: function(errorMessage){
+					console.error("Today in History API is not responding...")
+				}
+			});
+		}
+
+		// set timeout for new item
+		getRandomHistoryFact();
+		setInterval(function(){
+			getRandomHistoryFact();
+		}, 15000);
 
 	</script>
 
