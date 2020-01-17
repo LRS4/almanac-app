@@ -9,7 +9,7 @@
 			<div class="btn-group mr-2">
 				<button class="btn btn-sm btn-outline-secondary disabled">Overlay Options -></button>
 				<button id="btnPopulationLayer" class="btn btn-sm btn-outline-secondary">Population</button>
-				<button class="btn btn-sm btn-outline-secondary">Economic</button>
+				<button id="btnEconomicLayer" class="btn btn-sm btn-outline-secondary">Economic</button>
 				<button id="btnPoliticsLayer" class="btn btn-sm btn-outline-secondary">Political</button>
 				<button class="btn btn-sm btn-outline-secondary">Crime</button>
 				<button class="btn btn-sm btn-outline-secondary">Energy</button>
@@ -68,7 +68,7 @@
 		}).addTo(map);
 
 		// function to set rules for colours for population density
-		function getColor(d) {
+		function getPopulationColor(d) {
           return d > 1000 ? '#800026' :
                 d > 500  ? '#BD0026' :
                 d > 200  ? '#E31A1C' :
@@ -79,7 +79,7 @@
                             '#FFEDA0';
 		}
 		  
-		// function to set fules for colours for election results
+		// function to set rules for colours for election results
 		function getElectionResultColor(result) {
 			return result == 'Con' ? 'blue':
 				result == 'Lab'   ? 'red' : 
@@ -91,25 +91,22 @@
 				result == 'SF'    ? '#258C43' :
 				result == 'SNP'   ? 'yellow' :
 				result == 'Alliance' ? '#F4C72E' :
-								    "white"
+								    "pink"
+		}
+
+		// function to set rules for colours for median income
+		function getMedianIncomeColours(income) {
+			return income > 40000 ? 'green' :  
+				income > 20000 ? 'yellow' : 
+				income > 10000 ? 'red' : 
+								 'red'
 		}
 
 		// Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
 		// also adjusting the appearance a bit and adding a nice touch with dashed stroke.
 		function style(feature) {
 			return {
-				fillColor: getColor(feature.properties['2018 people per sq. km']),
-				weight: 0.5,
-				opacity: 1,
-				color: 'black',
-				dashArray: '3',
-				fillOpacity: 0.7
-			};
-		}
-
-		function styleElectionMap(feature) {
-			return {
-				fillColor: getElectionResultColor(feature.properties['first_party']),
+				fillColor: getPopulationColor(feature.properties['2018 people per sq. km']),
 				weight: 0.5,
 				opacity: 1,
 				color: 'black',
@@ -142,11 +139,6 @@
 			info.update();
 		}
 
-		function resetHighlightElection(e) {
-			geojsonLayers.electionData.resetStyle(e.target);
-			info.update();
-		}
-
 		// As an additional touch, let’s define a click listener that zooms to the state:
 		function zoomToFeature(e) {
 			map.fitBounds(e.target.getBounds());
@@ -157,14 +149,6 @@
 			layer.on({
 				mouseover: highlightFeature,
 				mouseout: resetHighlight,
-				click: zoomToFeature
-			});
-		}
-
-		function onEachFeatureElection(feature, layer) {
-			layer.on({
-				mouseover: highlightFeature,
-				mouseout: resetHighlightElection,
 				click: zoomToFeature
 			});
 		}
@@ -194,22 +178,56 @@
 		// CREATE THE BASE LAYERS
 		var geojsonLayers = {
 			'mapData': L.geoJson(mapData, {
-				style: style,
+				style: function(feature) {
+					return {
+						fillColor: getPopulationColor(feature.properties['2018 people per sq. km']),
+						weight: 0.5,
+						opacity: 1,
+						color: 'black',
+						dashArray: '3',
+						fillOpacity: 0.7
+					};
+			},
 				onEachFeature: onEachFeature
 			}),
 			'electionData': L.geoJson(electionResults, {
-				style: styleElectionMap,
-				onEachFeature: onEachFeatureElection
+				style: function(feature) {
+					return {
+						fillColor: getElectionResultColor(feature.properties['first_party']),
+						weight: 0.5,
+						opacity: 1,
+						color: 'black',
+						dashArray: '3',
+						fillOpacity: 0.7
+					};
+				},
+				onEachFeature: function(feature, layer) {
+					layer.on({
+						mouseover: highlightFeature,
+						mouseout: function(e) {
+							geojsonLayers.electionData.resetStyle(e.target);
+							info.update();
+						},
+						click: zoomToFeature
+					});
+				}
 			})
 		};
+
+		// CREATE FUNCTION THAT WILL REMOVE ALL BASE LAYERS
+		function removeAllLayers() {
+			for (var property in geojsonLayers) {
+				map.removeLayer(geojsonLayers[property])
+			}
+		}
 		
-		// add layer to map
+		// add population layer to map
 		$('#mapDataSource').text('ONS Population Estimates').attr('href', 'https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland')
 		map.addLayer(geojsonLayers.mapData);
 
 		// Update map with layers based upon conditions
 		$('#btnPoliticsLayer').click(function() {
-			map.removeLayer(geojsonLayers.mapData)
+			removeAllLayers();
 
 			// update hover panel
 			info.update = function (props) {
@@ -220,6 +238,7 @@
 					+ 'Electorate: ' + props.electorate + '<br />'
 					+ 'Valid Votes: ' + props.valid_votes + '<br />'
 					+ 'Turnout: ' + (((props.valid_votes + props.invalid_votes) / props.electorate) * 100).toFixed(2) + '% <br />'
+					+ 'MP: ' + props.mp_firstname + ' ' + props.mp_surname
 
 					: 'Hover over a boundary');
 			};
@@ -235,7 +254,7 @@
 		});
 
 		$('#btnPopulationLayer').click(function() {
-			map.removeLayer(geojsonLayers.electionData)
+			removeAllLayers();
 			info.update = function (props) {
 				this._div.innerHTML = '<h5>Population Density</h5>' +  (props ?
 					'<b>' + props.LAD19NM + '</b><br />' + props['Area (sq km)'] + ' sq. km' + '<br />'
@@ -246,6 +265,14 @@
 			info.update();
 			map.addLayer(geojsonLayers.mapData);
 			$('#mapDataSource').text('ONS Population Estimates').attr('href', 'https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland')
+		});
+
+		$('#btnEconomicLayer').click(function() {
+			removeAllLayers();
+
+			// TO DO
+
+			$('#mapDataSource').text('ONS Earnings and hours worked').attr('href', 'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/placeofresidencebylocalauthorityashetable8')
 		});
 		
 	
