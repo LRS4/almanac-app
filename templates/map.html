@@ -95,11 +95,11 @@
 		}
 
 		// function to set rules for colours for median income
-		function getMedianIncomeColours(income) {
-			return income > 40000 ? 'green' :  
-				income > 20000 ? 'yellow' : 
-				income > 10000 ? 'red' : 
-								 'red'
+		function getMedianIncomeColor(income) {
+			return income > 40000 ? '#1a9641' :  
+				income > 30000 ? '#a6d96a' :  
+				income > 20000 ? '#fdae61' : 
+								 '#d7191c'
 		}
 
 		// Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
@@ -212,6 +212,28 @@
 						click: zoomToFeature
 					});
 				}
+			}),
+			'incomeData': L.geoJson(mapData, {
+				style: function(feature) {
+					return {
+						fillColor: getMedianIncomeColor(feature.properties['2018 Median Salary']),
+						weight: 0.5,
+						opacity: 1,
+						color: 'black',
+						dashArray: '3',
+						fillOpacity: 0.7
+					};
+				},
+				onEachFeature: function(feature, layer) {
+					layer.on({
+						mouseover: highlightFeature,
+						mouseout: function(e) {
+							geojsonLayers.incomeData.resetStyle(e.target);
+							info.update();
+						},
+						click: zoomToFeature
+					});
+				}
 			})
 		};
 
@@ -270,9 +292,14 @@
 
 		$('#btnEconomicLayer').click(function() {
 			removeAllLayers();
-
-			// TO DO
-
+			info.update = function (props) {
+				this._div.innerHTML = '<h5>Income</h5>' +  (props ?
+					'<b>' + props.LAD19NM + '</b><br />Median: ' + props['2018 Median Salary']
+					+ '<br/>Mean: ' + props['2018 Mean Salary']
+					: 'Hover over a boundary <br/> Scroll to zoom');
+			};
+			info.update();
+			map.addLayer(geojsonLayers.incomeData);
 			$('#mapDataSource').text('ONS Earnings and hours worked').attr('href', 'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/placeofresidencebylocalauthorityashetable8')
 		});
 		
