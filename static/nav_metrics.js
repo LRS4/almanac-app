@@ -24,12 +24,30 @@ $(document).ready(function(){
 			}
 		});
 	} else {
-		let population = Cookies.get('population');
-		$(".populationMetric").text(numberWithCommas(population));
+		$(".populationMetric").text(numberWithCommas(Cookies.get('population')));
 	}
 
 	// TO DO - implement economy and happiness index calls
-	
+	if (Cookies.get('currentAccountBalance') == undefined) {
+		$.ajax({
+			type:"GET",
+			url:"https://api.db.nomics.world/v22/series/ONS/PNBP/HBOP.Q?observations=1",
+			async:false,
+			dataType: "json",
+			success: function(data) {
+				var arrayLength = data.series.docs[0].value.length
+				var currentAccountBalance = (data.series.docs[0].value[arrayLength-1]) * 1000000
+				$('.economyMetric').text(numberWithCommas(currentAccountBalance));
+				Cookies.set('currentAccountBalance', currentAccountBalance);
+			},
+			error: function(errorMessage){
+				console.error(errorMessage)
+			}
+		});
+	} else {
+		$('.economyMetric').text(numberWithCommas(Cookies.get('currentAccountBalance')));
+	}
+
 	$('#navMetrics').fadeIn();
 });
 

@@ -165,6 +165,7 @@ opacity: 0.7;
 
 .field-item.even {
   font-size: 25px;
+  font-weight: bold;
 }
 
 .field-item.even p {

@@ -27,7 +27,7 @@
 
     <!-- Custom styles and script for this template -->
     <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
-    <script src="{{url_for('static', filename='script.js')}}"></script>
+    <script src="{{url_for('static', filename='nav_metrics.js')}}"></script>
 
     <!-- Feather icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
@@ -39,9 +39,9 @@
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">Welcome, PM</a>
       <ul id="navMetrics" class="nav nav-expand mb-2" style="margin-top: 2px; padding-top:0; display:none;">
         <li class="nav-item">
-          <a class="nav-link alert-link" href="/economy" data-toggle="tooltip" data-placement="bottom" title="This entry records the difference between national government revenues and expenditures, expressed as a percent of GDP. A positive (+) number indicates that revenues exceeded expenditures (a budget surplus), while a negative (-) number indicates the reverse (a budget deficit). Normalizing the data, by dividing the budget balance by GDP, enables easy comparisons across countries and indicates whether a national government saves or borrows money. Countries with high budget deficits (relative to their GDPs) generally have more difficulty raising funds to finance expenditures, than those with lower deficits.">
+          <a class="nav-link alert-link" href="/economy" data-toggle="tooltip" data-placement="bottom" title="This entry records the difference between national government revenues and expenditures. A positive (+) number indicates that revenues exceeded expenditures (a budget surplus), while a negative (-) number indicates the reverse (a budget deficit or net borrowing).">
             <span data-feather="dollar-sign" style="color: white"></span>
-            <span class="economyMetric" style="color: white">-25,000,000,000</span>
+            <span class="economyMetric" style="color: white"></span>
           </a>
         </li>
         <li class="nav-item">
