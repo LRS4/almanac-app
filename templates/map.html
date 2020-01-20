@@ -9,9 +9,9 @@
 			<div class="btn-group mr-2">
 				<button class="btn btn-sm btn-outline-secondary disabled">Overlay Options -></button>
 				<button id="btnPopulationLayer" class="btn btn-sm btn-outline-secondary">Population</button>
-				<button id="btnEconomicLayer" class="btn btn-sm btn-outline-secondary">Economic</button>
-				<button id="btnPoliticsLayer" class="btn btn-sm btn-outline-secondary">Political</button>
-				<button class="btn btn-sm btn-outline-secondary">Crime</button>
+				<button id="btnEconomicLayer" class="btn btn-sm btn-outline-secondary">Economy</button>
+				<button id="btnPoliticsLayer" class="btn btn-sm btn-outline-secondary">Politics</button>
+				<button id ="btnDeprivationLayer" class="btn btn-sm btn-outline-secondary">Deprivation</button>
 			</div>
 			<button class="btn btn-sm btn-outline-secondary dropdown-toggle">
 			<span data-feather="calendar"></span>
@@ -94,12 +94,32 @@
 								    "pink"
 		}
 
-		// function to set rules for colours for median income
-		function getMedianIncomeColor(income) {
-			return income > 40000 ? '#1a9641' :  
-				income > 30000 ? '#a6d96a' :  
-				income > 20000 ? '#fdae61' : 
-								 '#d7191c'
+		// function to set rules for colours for gross value added
+		function getEconomicColor(metric) {
+			return metric > 97266 ? '#1a9850' :
+				metric > 75000  ? '#66bd63' :
+				metric > 50000  ? '#a6d96a' :
+				metric > 18041  ? '#d9ef8b' :
+				metric > 15000  ? '#fee08b' :
+				metric > 12000  ? '#fdae61' :
+				metric > 7000   ? '#f46d43' :
+                            	'#d73027';
+		}
+
+		// function to set rules for colors for deprivation ranks
+		function getDeprivationColor(rank) {
+			return rank > 300  ? '#006837' :
+				rank > 270  ? '#1a9850' :
+				rank > 240  ? '#66bd63' :
+				rank > 210  ? '#a6d96a' :
+				rank > 180  ? '#d9ef8b' :
+				rank > 150  ? '#ffffbf' :
+				rank > 120  ? '#fee08b' :
+				rank > 90  ? '#fdae61' :
+				rank > 60  ? '#f46d43' :
+				rank > 30  ? '#d73027' :
+				rank > 0   ? '#d73027' :
+                            '#FAFAF8';
 		}
 
 		// Next we define a styling function for our GeoJSON layer so that its fillColor depends on feature.properties.density property, 
@@ -213,10 +233,10 @@
 					});
 				}
 			}),
-			'incomeData': L.geoJson(mapData, {
+			'economicData': L.geoJson(mapData, {
 				style: function(feature) {
 					return {
-						fillColor: getMedianIncomeColor(feature.properties['2018 Median Salary']),
+						fillColor: getEconomicColor(feature.properties['2018 GVA GBP million']),
 						weight: 0.5,
 						opacity: 1,
 						color: 'black',
@@ -228,7 +248,29 @@
 					layer.on({
 						mouseover: highlightFeature,
 						mouseout: function(e) {
-							geojsonLayers.incomeData.resetStyle(e.target);
+							geojsonLayers.economicData.resetStyle(e.target);
+							info.update();
+						},
+						click: zoomToFeature
+					});
+				}
+			}),
+			'deprivationData': L.geoJson(mapData, {
+				style: function(feature) {
+					return {
+						fillColor: getDeprivationColor(feature.properties['2019 IMD - Rank']),
+						weight: 0.5,
+						opacity: 1,
+						color: 'black',
+						dashArray: '3',
+						fillOpacity: 0.7
+					};
+				},
+				onEachFeature: function(feature, layer) {
+					layer.on({
+						mouseover: highlightFeature,
+						mouseout: function(e) {
+							geojsonLayers.deprivationData.resetStyle(e.target);
 							info.update();
 						},
 						click: zoomToFeature
@@ -263,7 +305,8 @@
 					+ 'Turnout: ' + (((props.valid_votes + props.invalid_votes) / props.electorate) * 100).toFixed(2) + '% <br />'
 					+ 'MP: ' + props.mp_firstname + ' ' + props.mp_surname
 
-					: 'Hover over a boundary <br /> Scroll to zoom');
+					: 'Hover over a boundary <br /> Scroll to zoom' +
+					'<br /><br /><a href="https://members.parliament.uk/" target="_blank">Find your MP</a> <i class="fa fa-external-link"></i>');
 			};
 			
 			// call update method
@@ -293,14 +336,35 @@
 		$('#btnEconomicLayer').click(function() {
 			removeAllLayers();
 			info.update = function (props) {
-				this._div.innerHTML = '<h5>Income</h5>' +  (props ?
-					'<b>' + props.LAD19NM + '</b><br />Median: ' + props['2018 Median Salary']
-					+ '<br/>Mean: ' + props['2018 Mean Salary']
-					: 'Hover over a boundary <br/> Scroll to zoom');
+				this._div.innerHTML = '<h5>Gross Value Added</h5>' +  (props ?
+					'<b>' + props.LAD19NM + '<br /><br />GVA £m: ' + props['2018 GVA GBP million']
+					+ '<br />Median Income: ' + props['2018 Median Salary']
+					+ '<br/>Mean Income: ' + props['2018 Mean Salary']
+					: 'Gross value added (GVA) is a measure of the increase in the value' + 
+					'<br/>of the economy due to the production of goods and services.' +
+					'<br/><br/>Hover over a boundary <br/> Scroll to zoom');
 			};
 			info.update();
-			map.addLayer(geojsonLayers.incomeData);
-			$('#mapDataSource').text('ONS Earnings and hours worked').attr('href', 'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/placeofresidencebylocalauthorityashetable8')
+			map.addLayer(geojsonLayers.economicData);
+			$('#mapDataSource').text('ONS Gross value added regionally').attr('href', 'https://www.ons.gov.uk/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedbalanceduk/1998to2017')
+		});
+
+		$('#btnDeprivationLayer').click(function() {
+			removeAllLayers();
+			info.update = function (props) {
+				this._div.innerHTML = '<h5>Indices of Deprivation</h5>' +  (props ?
+					'<b>' + props.LAD19NM + '<br /><br />Rank: ' + props['2019 IMD - Rank']
+					: 'The Indices of Deprivation 2019 provide a set of relative' +
+					'<br/>measures of deprivation. The domains were combined using' + 
+					'<br/>the following weights:' +
+					'<ul><li>Income Deprivation (22.5%)</li><li>Employment Deprivation (22.5%)</li>' +
+					'<li>Education, Skills and Training Deprivation (13.5%)</li><li>Health Deprivation and Disability (13.5%)</li>' +
+					'<li>Crime (9.3%)</li><li>Barriers to Housing and Services (9.3%)</li><li>Living Environment Deprivation (9.3%)</li></ul>' +
+					'<br/>Hover over a boundary <br/> Scroll to zoom');
+			};
+			info.update();
+			map.addLayer(geojsonLayers.deprivationData);
+			$('#mapDataSource').text('GOV.UK English Indices of Deprivation 2019').attr('href', 'https://www.gov.uk/government/statistics/english-indices-of-deprivation-2019')
 		});
 		
 	
