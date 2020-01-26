@@ -201,12 +201,15 @@
 	$("#populationRow").click(function() {
 		myChart.data.datasets[0].data = populationTotals;
 		myChart.data.labels = populationYears; 
+		myChart.options.title.text = ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'];
 		myChart.update();
 	});
 
 	$("#passengersRow").click(function() {
 		myChart.data.datasets[0].data = dailyValues;
+		myChart.options.title.text = ['Passengers - change this', 'Source: change this'];
 		myChart.data.labels = days; 
+		
 		myChart.update();
 	});
 

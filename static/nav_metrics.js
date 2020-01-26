@@ -27,7 +27,7 @@ $(document).ready(function(){
 		$(".populationMetric").text(numberWithCommas(Cookies.get('population')));
 	}
 
-	// TO DO - implement economy and happiness index calls
+	// Economic budget surplus or deficit from db.nomics
 	if (Cookies.get('currentAccountBalance') == undefined) {
 		$.ajax({
 			type:"GET",
