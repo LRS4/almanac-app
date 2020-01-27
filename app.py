@@ -3,11 +3,7 @@ from flask import Flask, flash, jsonify, json, redirect, render_template, reques
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
-
-import numpy as np
-import pandas as pd
-import requests
-from bs4 import BeautifulSoup
+from utils import scraper
 
 # PEP8 Python Validator Tool: http://pep8online.com/
 
@@ -36,14 +32,7 @@ Session(app)
 @app.route("/", methods=['GET', 'POST'])
 def index():
     """Show introduction screen"""
-    try:
-        r = requests.get("https://www.theweek.co.uk/dailybriefing", allow_redirects=True, verify=False)
-        source = r.text
-        soup = BeautifulSoup(source, 'lxml')
-        newsHtml = soup.findAll('div', {'class' : 'field-items'})
-        newsHtml = str(newsHtml[0]).replace('href="', 'href="https://www.theweek.co.uk')
-    except:
-        newsHtml = "<br/>Error :( News feed failed to load... try refreshing the page"
+    newsHtml = scraper.getDailyBriefing()
     marker = 'home'
     return render_template("index.html", marker=marker, newsHtml=newsHtml)
 
