@@ -40,8 +40,9 @@ def index():
 @app.route("/population", methods=['GET'])
 def population():
     """Show population statistics"""
+    yearEnding, netMigration, emigration, immigration = scraper.getMigrationData()
     marker = 'population'
-    return render_template("population.html", marker=marker)
+    return render_template("population.html", marker=marker, years=yearEnding, netMigration=netMigration)
 
 @app.route("/map", methods=['GET'])
 def map():

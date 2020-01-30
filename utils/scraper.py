@@ -1,7 +1,24 @@
 import numpy as np
 import pandas as pd
-import requests
+import requests, json
 from bs4 import BeautifulSoup
+
+def getMigrationData():
+    """
+    Sends a HTTP request to get migration data from the ONS
+
+    Args:
+        None
+
+    Returns: 
+        migration (dataframe) : Time series dataframe of migration data
+    """
+    migration = pd.read_csv('data/migration.csv')
+    yearEnding = np.array(migration['Year ending'])
+    netMigration = np.array(migration['Net migration']) * 1000
+    emigration = np.array(migration['Emigration'])
+    immigration = np.array(migration['Immigration'])
+    return yearEnding, netMigration, emigration, immigration
 
 def getDailyBriefing():
     """

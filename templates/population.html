@@ -31,42 +31,36 @@
 					<td id="populationValue">...</td>
 				</tr>
 				<tr>
-					<td id="passengersRow">Births (last 12 months)</td>
-					<td>consectetur</td>
+					<td id="birthsRow">Birth Rate</td>
+					<td id="birthsValue">...</td>
 				</tr>
 				<tr>
-					<td>Deaths (last 12 months)</td>
-					<td>nec</td>
+					<td>Death Rate</td>
+					<td id="deathsValue">...</td>
 				</tr>
 				<tr>
-					<td>Youths</td>
-					<td>Sed</td>
+					<td class="ageRows">Youths</td>
+					<td id="youthValue">...</td>
 				</tr>
 				<tr>
-					<td>Working Age</td>
-					<td>diam</td>
+					<td class="ageRows">Adults</td>
+					<td id="middleValue">...</td>
 				</tr>
 				<tr>
-					<td>Elderly</td>
-					<td>quis</td>
+					<td class="ageRows">Over 65s</td>
+					<td id="elderlyValue">...</td>
 				</tr>
 				<tr>
-					<td>Migrants</td>
-					<td>ipsum</td>
-				</tr>
-				<tr>
-					<td>Refugees</td>
-					<td>nec</td>
-				</tr>
-				<tr>
-					<td>Black, Asian and Minority Ethnic</td>
-					<td>elementum</td>
+					<td id="migrantRow">Migration Rate</td>
+					<td id="migrantValue">...</td>
 				</tr>
 			</tbody>
 		</table>
 		</div>
 
 		<canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
+
+		<canvas class="my-4 w-100" id="myBarChart" width="900" height="200" style="display:none"></canvas>
 
 	</main>
 	</div>
@@ -139,21 +133,39 @@
 	});
 
 	// Get LATEST WORLD FACTBOOK
+	var youths;
+	var adults;
+	var elderly;
 	$.ajax({
 		type:"GET",
 		url:"https://raw.githubusercontent.com/iancoleman/cia_world_factbook_api/master/data/factbook.json",
 		async:false,
 		dataType: "json",
 		success: function(data) {
-		console.log("World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
-		//$("#sectionTitle").html(data.countries.united_kingdom.data.name);
-		console.log(data.countries.united_kingdom.data);
-		console.log(data.countries.united_kingdom.data.introduction['background']);
+			console.log("World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
+			var uk = data.countries.united_kingdom.data
+			console.log(uk)
+
+			// update demographic table data
+			let population = Cookies.get('population');
+			youths = population / 100 * (uk.people.age_structure['0_to_14'].percent + uk.people.age_structure['15_to_24'].percent);
+			adults = population / 100 * (uk.people.age_structure['25_to_54'].percent + uk.people.age_structure['55_to_64'].percent);
+			elderly = population / 100 * (uk.people.age_structure['65_and_over'].percent);
+
+			// update birth, death and migration rate
+			$('#birthsValue').text(uk.people.birth_rate.births_per_1000_population + ' per 1000 population')
+			$('#deathsValue').text(uk.people.death_rate.deaths_per_1000_population + ' per 1000 population')
+			$('#migrantValue').text(uk.people.net_migration_rate.migrants_per_1000_population + ' per 1000 population')
+
+
 		},
 		error: function(errorMessage){
 			console.error("World Factbook API is not responding...")
 		}
 	});
+	$('#youthValue').text(numberWithCommas(youths.toFixed(0)));
+	$('#middleValue').text(numberWithCommas(adults.toFixed(0)));
+	$('#elderlyValue').text(numberWithCommas(elderly.toFixed(0)));
 
 	// DUMMY DATA
 	var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -164,22 +176,52 @@
 	var myChart = new Chart(ctx, {
 		type: 'line',
 		data: {
-		labels: populationYears,
-		datasets: [{
-			data: populationTotals,
-			lineTension: 0,
-			backgroundColor: 'transparent',
-			borderColor: '#007bff',
-			borderWidth: 4,
-			pointBackgroundColor: '#007bff'
-		}]
+			labels: populationYears,
+			datasets: [{
+				data: populationTotals,
+				lineTension: 0,
+				backgroundColor: 'transparent',
+				borderColor: '#007bff',
+				borderWidth: 4,
+				pointBackgroundColor: '#007bff'
+			}]
 		},
 		options: {
 		scales: {
 			yAxes: [{
-			ticks: {
-				beginAtZero: false
-			}
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		},
+		legend: {
+			display: false,
+		},
+		title: {
+			display: true,
+			text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
+			position: 'bottom'
+		}
+		}
+	});
+
+	// CREATE BAR CHART
+	var chrt = document.getElementById("myBarChart");
+	var myBarChart = new Chart(chrt, {
+		type: 'bar',
+		data: {
+			labels: ['Youths', 'Adults', 'Over 65s'],
+			datasets: [{
+				data: [youths, adults, elderly],
+				lineTension: 0,
+			}]
+		},
+		options: {
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero: true
+				}
 			}]
 		},
 		legend: {
@@ -199,20 +241,27 @@
 	});
 
 	$("#populationRow").click(function() {
+		$('#myBarChart').css('display', 'none');
+		$('#myChart').css('display', 'block');
 		myChart.data.datasets[0].data = populationTotals;
 		myChart.data.labels = populationYears; 
 		myChart.options.title.text = ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'];
 		myChart.update();
 	});
 
-	$("#passengersRow").click(function() {
-		myChart.data.datasets[0].data = dailyValues;
-		myChart.options.title.text = ['Passengers - change this', 'Source: change this'];
-		myChart.data.labels = days; 
-		
+	$("#migrantRow").click(function() {
+		$('#myBarChart').css('display', 'none');
+		$('#myChart').css('display', 'block');
+		myChart.data.datasets[0].data = [{% for item in netMigration %}{{item | safe}},{% endfor%}];
+		myChart.data.labels = [{% for year in years %}'{{ year | safe}}',{% endfor %}]; 
+		myChart.options.title.text = ['UK Net Migration', 'Source: ONS (http://shorturl.at/qxyF8)'];
 		myChart.update();
 	});
 
+	$('.ageRows').click(function() {
+		$('#myChart').css('display', 'none');
+		$('#myBarChart').css('display', 'block');
+	});
 	</script>
 
 {% endblock %}
