@@ -1,7 +1,31 @@
 import numpy as np
 import pandas as pd
-import requests, json
+import requests, json, time
 from bs4 import BeautifulSoup
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def getApprovalRating(primeMinister):
+    """
+    Sends a HTTP request to get current PM's approval rating from YouGov
+
+    Args:
+        None
+
+    Returns: 
+        rating (int) : The current approval rating
+    """
+    try:
+        r = requests.get("http://yougov.co.uk/topics/politics/explore/public_figure/" + primeMinister, allow_redirects=True, verify=False)
+        source = r.text
+        soup = BeautifulSoup(source, 'lxml')
+        rating = soup.find('span', {'class' : 'result'})
+        rating = rating.findAll('span')
+        rating = str(rating[-3].contents[0]).strip()
+    except:
+        rating = "..."
+        time.sleep(3)
+    return rating
 
 def getMigrationData():
     """

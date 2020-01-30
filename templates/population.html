@@ -121,10 +121,10 @@
 	success: function(data) {
 		// add to arrays
 		for (let i = 0; i < data[1].length; i++ ) {
-		if (data[1][i]["value"] != null) {
-			populationTotals.unshift(data[1][i]["value"]);
-			populationYears.unshift((data[1][i]["date"])).toString();
-		}
+			if (data[1][i]["value"] != null) {
+				populationTotals.unshift(data[1][i]["value"]);
+				populationYears.unshift((data[1][i]["date"])).toString();
+			}
 		}
 	},
 	error: function(errorMessage){
@@ -156,8 +156,6 @@
 			$('#birthsValue').text(uk.people.birth_rate.births_per_1000_population + ' per 1000 population')
 			$('#deathsValue').text(uk.people.death_rate.deaths_per_1000_population + ' per 1000 population')
 			$('#migrantValue').text(uk.people.net_migration_rate.migrants_per_1000_population + ' per 1000 population')
-
-
 		},
 		error: function(errorMessage){
 			console.error("World Factbook API is not responding...")
