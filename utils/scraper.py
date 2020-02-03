@@ -15,16 +15,15 @@ def getApprovalRating(primeMinister):
     Returns: 
         rating (int) : The current approval rating
     """
-    try:
-        r = requests.get("http://yougov.co.uk/topics/politics/explore/public_figure/" + primeMinister, allow_redirects=True, verify=False)
-        source = r.text
-        soup = BeautifulSoup(source, 'lxml')
-        rating = soup.find('span', {'class' : 'result'})
-        rating = rating.findAll('span')
-        rating = str(rating[-3].contents[0]).strip()
-    except:
-        rating = "..."
-        time.sleep(3)
+
+    url = "http://yougov.co.uk/topics/politics/explore/public_figure/" + primeMinister
+    headers = {"User-Agent":"Mozilla/5.0"}
+    r = requests.get(url, headers=headers, allow_redirects=True)
+    source = r.text
+    soup = BeautifulSoup(source, 'lxml')
+    rating = soup.find('span', {'class' : 'result'})
+    rating = rating.findAll('span')
+    rating = str(rating[-3].contents[0]).strip()
     return rating
 
 def getMigrationData():

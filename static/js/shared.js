@@ -17,9 +17,9 @@ $(document).ready(function(){
 				var currentPopulationTotal = data[1][0]["value"]
 				}
 				$(".populationMetric").text(numberWithCommas(currentPopulationTotal));
-				Cookies.set('population', currentPopulationTotal);
+				Cookies.set('population', currentPopulationTotal, { expires: 7 });
 			},
-			error: function(errorMessage){
+			error: function(errorMessage) {
 				console.error(errorMessage)
 			}
 		});
@@ -38,7 +38,7 @@ $(document).ready(function(){
 				var arrayLength = data.series.docs[0].value.length
 				var currentAccountBalance = (data.series.docs[0].value[arrayLength-1]) * 1000000
 				$('.economyMetric').text(numberWithCommas(currentAccountBalance));
-				Cookies.set('currentAccountBalance', currentAccountBalance);
+				Cookies.set('currentAccountBalance', currentAccountBalance, { expires: 7 });
 			},
 			error: function(errorMessage){
 				console.error(errorMessage)
@@ -46,6 +46,44 @@ $(document).ready(function(){
 		});
 	} else {
 		$('.economyMetric').text(numberWithCommas(Cookies.get('currentAccountBalance')));
+	}
+
+	// get approval ratings data for current PM
+	if (Cookies.get('pmApprovalRating') == undefined) {
+		var pm;
+		$.ajax({
+			type:"GET",
+			url:"https://raw.githubusercontent.com/iancoleman/cia_world_factbook_api/master/data/factbook.json",
+			async:false,
+			dataType: "json",
+			success: function(data) {
+				console.log("World Factbook finished loading... " + Object.keys(data.countries).length + " entries");
+				var uk = data.countries.united_kingdom.data;
+				pm = (uk.government.executive_branch.head_of_government).split(" ");
+				let surname = pm[3].toLowerCase();
+				surname = surname.charAt(0).toUpperCase() + surname.slice(1)
+				pm = pm[2] + "_" + surname
+			},
+			error: function(errorMessage){
+				console.error(errorMessage);
+			}
+		});
+
+		$.ajax({
+			type:"GET",
+			url: '/approval?pm=' + pm,
+			async:false,
+			dataType: "json",
+			success: function(data) {
+				$('.approvalMetric').text(data + '%');
+				Cookies.set('pmApprovalRating', data, { expires: 7 });
+			},
+			error: function(errorMessage) {
+				console.error(errorMessage);
+			}
+		});
+	} else {
+		$('.approvalMetric').text(Cookies.get('pmApprovalRating') + '%')
 	}
 
 	$('#navMetrics').fadeIn();

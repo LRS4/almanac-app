@@ -58,7 +58,15 @@ def sources():
 @app.route("/tools", methods=['GET'])
 def tools():
     """Show tools list"""
-    return render_template("tools.html")  
+    return render_template("tools.html") 
+
+@app.route("/approval", methods=['GET'])
+def approval():
+    """Get approval rating""" 
+    pm = request.args.get('pm')
+    approval = scraper.getApprovalRating(pm)
+    return jsonify(approval)
+
 
 if __name__ == '__main__':
     app.run()
