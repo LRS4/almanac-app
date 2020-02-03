@@ -58,10 +58,14 @@
 		</table>
 		</div>
 
-		<canvas class="my-4 w-100" id="myChart" width="900" height="200"></canvas>
-
-		<canvas class="my-4 w-100" id="myBarChart" width="900" height="200" style="display:none"></canvas>
-
+		<div id="chartDiv">
+			<button id="btnFullScreen"class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Make the chart full screen">
+				<span data-feather="maximize"></span>
+			</button>
+			<canvas class="my-4 w-100" id="myChart" width="900" height="250"></canvas>
+			<canvas class="my-4 w-100" id="myBarChart" width="900" height="250" style="display:none"></canvas>
+		</div>
+	
 	</main>
 	</div>
 
@@ -185,21 +189,24 @@
 			}]
 		},
 		options: {
-		scales: {
-			yAxes: [{
-				ticks: {
-					beginAtZero: true
-				}
-			}]
-		},
-		legend: {
-			display: false,
-		},
-		title: {
-			display: true,
-			text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
-			position: 'bottom'
-		}
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: true,
+						userCallback: function(value, index, values) {
+							return value.toLocaleString();  // add commas
+						}
+					}
+				}]
+			},
+			legend: {
+				display: false,
+			},
+			title: {
+				display: true,
+				text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
+				position: 'bottom'
+			}
 		}
 	});
 
@@ -215,21 +222,24 @@
 			}]
 		},
 		options: {
-		scales: {
-			yAxes: [{
-				ticks: {
-					beginAtZero: true
-				}
-			}]
-		},
-		legend: {
-			display: false,
-		},
-		title: {
-			display: true,
-			text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
-			position: 'bottom'
-		}
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: true,
+						userCallback: function(value, index, values) {
+							return value.toLocaleString();  // add commas
+						}
+					}
+				}]
+			},
+			legend: {
+				display: false,
+			},
+			title: {
+				display: true,
+				text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
+				position: 'bottom'
+			}
 		}
 	});
 
@@ -259,6 +269,11 @@
 	$('.ageRows').click(function() {
 		$('#myChart').css('display', 'none');
 		$('#myBarChart').css('display', 'block');
+	});
+
+	// Full screen toggle
+	$('#btnFullScreen').click(function(e){
+		$('#chartDiv').toggleClass('fullscreen');
 	});
 	</script>
 
