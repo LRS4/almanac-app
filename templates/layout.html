@@ -40,16 +40,16 @@
   <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">Welcome, PM</a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">Welcome</a>
       <ul id="navMetrics" class="nav nav-expand mb-2" style="margin-top: 2px; padding-top:0; display:none;">
         <li class="nav-item">
-          <a class="nav-link alert-link" href="/economy" data-toggle="tooltip" data-placement="bottom" title="This entry records the difference between national government revenues and expenditures. A positive (+) number indicates that revenues exceeded expenditures (a budget surplus), while a negative (-) number indicates the reverse (a budget deficit or net borrowing).">
+          <a class="nav-link alert-link" href="/economy" data-toggle="tooltip" data-placement="bottom" title="This entry records the difference between national government revenues and expenditures from the ONS BoP Current Account Balance SA. A positive (+) number indicates that revenues exceeded expenditures (a budget surplus), while a negative (-) number indicates the reverse (a budget deficit or net borrowing).">
             <span data-feather="dollar-sign" style="color: white"></span>
             <span class="economyMetric" style="color: white"></span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link alert-link" href="/population" data-toggle="tooltip" data-placement="bottom" title="This shows the total population currently residing according to ONS and World Bank estimates" style="color: white">
+          <a class="nav-link alert-link" href="/population" data-toggle="tooltip" data-placement="bottom" title="This shows the total population of the UK according to World Bank estimates" style="color: white">
             <span data-feather="users" style="color: white"></span>
             <span class="populationMetric" style="color: white">...</span>
           </a>
@@ -211,7 +211,7 @@
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLongTitle">How hard can this be?</h5>
+				<h5 class="modal-title" id="exampleModalLongTitle">Welcome to the UK Almanac!</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 				</button>
@@ -219,6 +219,9 @@
 			<div class="modal-body">
         Congratulations on your election win, Prime Minister! Although now comes the hard part of actually running the place... 
         Not to fear! Your trusty advisor has put together an almanac of information on our beloved country to bring you up to speed.
+        <br><br>
+        Numbers are very important. For example, we need to know how much we're spending, predict healthcare demand, 
+        and measure educational outcomes. In general, use analysis to make better evidence-based decisions.
         <br><br>
         I'm sure we will be improving things in no time, and the citizens will love us for it! Our very own island of paradise! So much to 
         do and such little time... the next election will be here in no time and we need those approval ratings high.
@@ -230,7 +233,9 @@
           <li>GOV.UK</li>
           <li>ONS</li>
           <li>World Bank</li>
+          <li><a href="/sources" class="alert-link">Many more...</a></li>
         </ul>
+        This is a work in progress so please don't fire me if a page isn't there yet... It will be eventually!
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
@@ -246,5 +251,13 @@
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
+
+  	$(function () {
+	  	$('[data-toggle="popover"]').popover()
+    })
+    
+    $('.helpIcon').click(function() {
+      stopPropagation();
+    });
   </script>
 </html>

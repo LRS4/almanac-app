@@ -181,4 +181,13 @@ opacity: 0.7;
   left: 0; 
 }
 
-#chartDiv{background:white; height: 500px; width: 100%}
+#chartDiv{
+  background:white;
+  height: 500px;
+  width: 100%
+}
+
+.helpIcon {
+  color: darkslategrey;
+  margin-left: 10px;
+}

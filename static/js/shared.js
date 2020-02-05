@@ -93,3 +93,10 @@ $(document).ready(function(){
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+// function to stop propagation of outer div on click event
+function stopPropagation() {
+	if (!e) var e = window.event;
+	e.cancelBubble = true;
+	if (e.stopPropagation) e.stopPropagation();
+}
