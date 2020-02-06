@@ -27,7 +27,7 @@
 			</thead>
 			<tbody>
 				<tr id="populationRow">
-					<td><b>Population</b><i id="populationHelpIcon" class="fa fa-question-circle helpIcon" data-toggle="popover" title="Population" data-content="The total population of the UK according to World Bank estimates. Chart shows population trend."></i></td>
+					<td><b>Population</b><i id="populationHelpIcon" class="fa fa-question-circle helpIcon" data-toggle="popover" title="Population" data-content="The total population of the UK according to World Bank estimates. Chart shows population trend." onclick="$(this).toggleClass('helpActive')"></i></td>
 					<td id="populationValue">...</td>
 				</tr>
 				<tr>
@@ -59,7 +59,7 @@
 		</div>
 
 		<div id="chartDiv">
-			<button id="btnFullScreen"class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Make the chart full screen">
+			<button id="btnFullScreen"class="btn btn-outline-secondary btn-sm">
 				<span data-feather="maximize"></span>
 			</button>
 			<canvas class="my-4 w-100" id="myChart" width="900" height="250"></canvas>
@@ -206,7 +206,8 @@
 					display: true,
 					text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
 					position: 'bottom'
-				}
+				},
+				maintainAspectRatio: false
 			}
 		});
 
@@ -239,7 +240,8 @@
 					display: true,
 					text: ['UK Population Trend', 'Source: World Bank (http://api.worldbank.org/)'],
 					position: 'bottom'
-				}
+				},
+				maintainAspectRatio: false
 			}
 		});
 
