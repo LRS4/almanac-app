@@ -28,7 +28,7 @@ def getApprovalRating(primeMinister):
 
 def getMigrationData():
     """
-    Sends a HTTP request to get migration data from the ONS
+    Parses CSV migration data from the ONS
 
     Args:
         None
